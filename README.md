@@ -24,4 +24,4 @@ const firebaseConfig = {
 npx expo start
 ```
 
-Não é possivel roda o app na versão atual do expoGo, é preciso baixar uma versão que suporte o sdk 48
+Não é possivel rodar o app na versão atual do expoGo, é preciso baixar uma versão que suporte o sdk 48
