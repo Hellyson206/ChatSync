@@ -7,7 +7,8 @@ import {
   addDoc,
   orderBy,
   query,
-  onSnapshot
+  onSnapshot,
+  setDoc
 } from 'firebase/firestore';
 
 
@@ -31,19 +32,20 @@ export default function Signup({ navigation }) {
   ];
 
   const onHandleSignup = () => {
-    if (email !== '' && password !== '') {
-      createUserWithEmailAndPassword(auth, email, password)
-        .then((userCredential) => {
-          // saveUserWithRecommendations(userCredential.user.uid);
-          addDoc(collection(database, 'users'), {
-            email:email,
-            recommendations: selectedRecommendations.map(recommendation => recommendation.text)
-          });
-          console.log('Cadastro realizado com sucesso');
-        })
-        .catch((err) => Alert.alert("Erro no cadastro", err.message));
-    }
-  };
+  if (email !== '' && password !== '' && selectedRecommendations.length > 0) {
+    createUserWithEmailAndPassword(auth, email, password)
+      .then((userCredential) => {
+        setDoc(collection(database, 'users', userCredential.user.uid), {
+          email: email,
+          recommendations: selectedRecommendations.map(recommendation => recommendation.text)
+        });
+        console.log('Cadastro realizado com sucesso');
+      })
+      .catch((err) => Alert.alert("Erro no cadastro", err.message));
+  } else {
+    Alert.alert("Erro no cadastro", "Por favor, preencha todos os campos e selecione pelo menos uma recomendação.");
+  }
+};
 
   const saveUserWithRecommendations = (userId) => {
     // Salvando o usuário com recomendações no Firebase
@@ -63,9 +65,7 @@ export default function Signup({ navigation }) {
   };
 
   return (
-    <View style={styles.container}>
-      
-      {/* <View style={styles.whiteSheet} /> */}
+    <ScrollView contentContainerStyle={styles.container}>
       <View style={styles.form}>
         <Text style={styles.title}>Cadastre-se</Text>
         <TextInput
@@ -116,7 +116,7 @@ export default function Signup({ navigation }) {
         </View>
       </View>
       <StatusBar barStyle="light-content" />
-    </View>
+    </ScrollView>
   );
 }
 
