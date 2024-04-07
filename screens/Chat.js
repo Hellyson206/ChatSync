@@ -9,8 +9,7 @@ import { AntDesign } from '@expo/vector-icons';
 import colors from '../colors';
 
 export default function Chat({ route }) {
-   // const { groupId } = route.params; // Assumindo que groupId é passado como parâmetro de navegação
-    const groupId = "grupofifa23";
+    const { groupId } = route.params; // Assumindo que groupId é passado como parâmetro de navegação
     const [messages, setMessages] = useState([]);
     const navigation = useNavigation();
 
@@ -43,7 +42,10 @@ export default function Chat({ route }) {
                     _id: doc.id,
                     createdAt: doc.data().createdAt.toDate(),
                     text: doc.data().text,
-                    user: doc.data().user
+                    user: {
+                        _id: doc.data().user._id, // Adiciona o _id do usuário
+                        avatar: doc.data().user.avatar
+                    }
                 }))
             );
         });

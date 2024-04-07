@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { StyleSheet, Text, View, Button, TextInput, Image, SafeAreaView, TouchableOpacity, StatusBar, Alert } from "react-native";
+import { StyleSheet, Text, View, Button, TextInput, Image, SafeAreaView, TouchableOpacity, StatusBar, Alert, ScrollView } from "react-native";
 import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { auth, database } from '../config/firebase';
 import {
@@ -63,7 +63,6 @@ export default function Signup({ navigation }) {
       setSelectedRecommendations([...selectedRecommendations, recommendation]);
     }
   };
-
   return (
     <ScrollView contentContainerStyle={styles.container}>
       <View style={styles.form}>
