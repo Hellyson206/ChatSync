@@ -3,5 +3,6 @@ export default {
     gray: '#C5C5C7',
     mediumGray: '#F6F7FB',
     lightGray: '#FAFAFA',
-    lightBlue: '#5599FF'
+    lightBlue: '#5599FF',
+    lightGreen: '#D3E67B',
 };

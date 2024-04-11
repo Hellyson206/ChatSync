@@ -23,8 +23,19 @@ return (
 
 function ChatStack() {
   return (
-    <Stack.Navigator defaultScreenOptions={Home}>
-      <Stack.Screen name='Home' component={Home} />
+    <Stack.Navigator
+      screenOptions={{
+        headerShown: true, 
+        headerTitleAlign: 'center', 
+      }}
+    >
+      <Stack.Screen 
+        name='Home' 
+        component={Home} 
+        options={{
+          headerShown: false,
+        }}
+      />
       <Stack.Screen name='Chat' component={Chat} />
     </Stack.Navigator>
   );
