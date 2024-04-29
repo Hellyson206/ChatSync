@@ -73,7 +73,7 @@ export default function Chat({ route }) {
     // Busca e exibe as mensagens do grupo
     useEffect(() => {
         const messagesRef = collection(database, `groups/${groupId}/messages`);
-        const q = query(messagesRef, orderBy('createdAt'));
+        const q = query(messagesRef, orderBy('createdAt', 'asc'));
 
         const unsubscribe = onSnapshot(q, querySnapshot => {
             setMessages(
@@ -82,10 +82,11 @@ export default function Chat({ route }) {
                     createdAt: doc.data().createdAt.toDate(),
                     text: doc.data().text,
                     user: {
-                        _id: doc.data().user._id,
-                        avatar: doc.data().user.avatar
+                    _id: doc.data().user._id, // _id do usuário
+                    name: doc.data().user._id, // Use _id como name
+                    avatar: doc.data().user.avatar
                     }
-                }))
+                })).reverse()
             );
         });
 
