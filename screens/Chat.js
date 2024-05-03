@@ -1,6 +1,6 @@
-import React, { useState, useEffect, useLayoutEffect, useCallback } from 'react';
+import React, { useState, useEffect, useLayoutEffect, useCallback, useContext } from 'react';
 import { TouchableOpacity, View, Text } from 'react-native';
-import { Bubble, GiftedChat, Send } from 'react-native-gifted-chat';
+import { Bubble, GiftedChat, Send, Avatar } from 'react-native-gifted-chat'; 
 import { collection, addDoc, orderBy, query, onSnapshot, doc, collectionGroup, getDoc, getDocs } from 'firebase/firestore';
 import { signOut } from 'firebase/auth';
 import { auth, database } from '../config/firebase';
@@ -9,7 +9,7 @@ import { AntDesign, FontAwesome, MaterialCommunityIcons } from '@expo/vector-ico
 import colors from '../colors';
 
 export default function Chat({ route }) {
-    const { groupId } = route.params; // Assumindo que groupId é passado como parâmetro de navegação
+    const { groupId } = route.params; 
     const [messages, setMessages] = useState([]);
     const [groupInfo, setGroupInfo] = useState({});
     const navigation = useNavigation();
@@ -18,7 +18,6 @@ export default function Chat({ route }) {
         signOut(auth).catch(error => console.log('Error logging out: ', error));
     };
 
-    // Busca as informações do grupo
     useEffect(() => {
         const fetchGroupInfo = async () => {
             try {
@@ -45,13 +44,11 @@ export default function Chat({ route }) {
                     onPress={() => navigation.goBack()}
                 >
                     <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                    <FontAwesome name="angle-left" size={24} color={colors.gray} />
-                    <View>
-                     <Text style={{ fontSize: 16, marginLeft: 10, fontWeight: 'bold' }}>{groupInfo.title}</Text>
-                <View>
-                <Text style={{ fontSize: 12, marginLeft: 10, color: 'gray' }}>{groupInfo.members ? `${groupInfo.members.length} membros` : ''}</Text>
-                </View>
-                </View>
+                        <FontAwesome name="angle-left" size={24} color={colors.gray} />
+                        <View>
+                            <Text style={{ fontSize: 16, marginLeft: 10, fontWeight: 'bold' }}>{groupInfo.title}</Text>
+                            <Text style={{ fontSize: 12, marginLeft: 10, color: 'gray' }}>{groupInfo.members ? `${groupInfo.members.length} membros` : ''}</Text>
+                        </View>
                     </View>
                 </TouchableOpacity>
             ),
@@ -70,7 +67,6 @@ export default function Chat({ route }) {
         });
     }, [navigation, groupInfo]);
 
-    // Busca e exibe as mensagens do grupo
     useEffect(() => {
         const messagesRef = collection(database, `groups/${groupId}/messages`);
         const q = query(messagesRef, orderBy('createdAt', 'asc'));
@@ -82,9 +78,9 @@ export default function Chat({ route }) {
                     createdAt: doc.data().createdAt.toDate(),
                     text: doc.data().text,
                     user: {
-                    _id: doc.data().user._id, // _id do usuário
-                    name: doc.data().user._id, // Use _id como name
-                    avatar: doc.data().user.avatar
+                        _id: doc.data().user._id,
+                        name: doc.data().user._id,
+                        avatar: doc.data().user.avatar
                     }
                 })).reverse()
             );
@@ -106,38 +102,29 @@ export default function Chat({ route }) {
         });
     }, [groupId]);
 
-    const renderSend = (props) => {
-        return(
-            <Send {...props}>
-                <View>
-                    <MaterialCommunityIcons
-                    name='send-circle'
-                    style={{marginBottom: 5, marginRight: 5}}
-                    size={32}
-                    color= '#2e64e5'
-                    />
-                </View>
-            </Send>
-        );
+    const onPressUserAvatar = async (user) => {
+        console.log('ID do usuário selecionado:', user._id);
+        console.log('ID do usuário logado:', auth?.currentUser?.email);
+        // Aqui você deve redirecionar para o chat privado
+        // Verifique se o usuário está autenticado
+        if (auth.currentUser) {
+            // Crie a referência para o chat privado
+            const privateChatId = `${auth.currentUser.email}_${user._id}`;
+            navigation.navigate('PrivateChat', { privateChatId: privateChatId });
+        } else {
+            // O usuário não está autenticado, você pode redirecioná-lo para a página de login
+            navigation.navigate('Login');
+        }
     };
 
-    const renderBubble = (props) => {
+    const renderAvatar = (props) => {
+        const { currentMessage } = props;
         return (
-            <Bubble 
-            {...props}
-            wrapperStyle={{
-                right: {
-                    backgroundColor: '#2e64e5'
-                }
-            }}
-            textStyle={{
-                right: {
-                    color: '#fff'
-                }
-            }}
-            />
+            <TouchableOpacity onPress={() => onPressUserAvatar(currentMessage.user)}>
+                <Avatar {...props} />
+            </TouchableOpacity>
         );
-    }
+    };
 
     return (
         <GiftedChat
@@ -159,8 +146,7 @@ export default function Chat({ route }) {
                 _id: auth?.currentUser?.email,
                 avatar: 'https://i.pravatar.cc/210',
             }}
-            renderBubble={renderBubble}
-            renderSend={renderSend}
+            renderAvatar={renderAvatar} 
         />
     );
 }

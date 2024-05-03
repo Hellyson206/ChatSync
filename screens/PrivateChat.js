@@ -1,17 +1,20 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { View, Text, Button } from 'react-native';
 import { collection, addDoc, serverTimestamp, query, where, getDocs } from 'firebase/firestore';
-import { AuthenticatedUserContext } from '../App';
+import { AuthenticatedUserContext } from '../App'; // Importando o contexto corretamente
 import { database } from '../config/firebase';
 
 export default function PrivateChat({ route, navigation }) {
     const { user } = useContext(AuthenticatedUserContext);
+
     const { otherUserId } = route.params;
     const [privateChatId, setPrivateChatId] = useState(null);
 
     useEffect(() => {
         const fetchPrivateChat = async () => {
             try {
+                if (!user) return; // Verificando se o usuário está definido
+
                 // Procura por um chat privado entre os dois usuários
                 const q = query(collection(database, 'privateChats'), 
                                 where('users', '==', [user.uid, otherUserId]));
